@@ -1,0 +1,11 @@
+[Unit]
+Description=F8-Backend
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/env NODE_ENV=production PORT=49200 node /opt/F8Tech/backend/app.js
+WorkingDirectory=/opt/F8Tech/backend
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
