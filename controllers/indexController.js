@@ -109,7 +109,6 @@ export async function diskUsage(req, res) {
     try {
         // Get the disk IO stats using systeminformation
         const diskIo = await si.disksIO();
-        console.log('Disk IO Stats:', diskIo);
 
         // Extract read and write IO operations
         const readIO = diskIo.rIO;
@@ -144,6 +143,11 @@ export async function diskUsage(req, res) {
         res.status(500).json({ error: 'Failed to fetch disk usage' });
     }
 }
+
+import { promisify } from 'util';
+
+// Convert exec to return a promise
+const execPromise = promisify(exec);
 
 export async function systemTime(req, res) {
     try {
@@ -222,4 +226,3 @@ export async function systemTimezone(req, res) {
     }
 }
 
-// Adding a bunch of comments

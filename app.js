@@ -6,8 +6,10 @@ import accountRoutes from './routes/accountRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
 import loginRoutes from './routes/loginRoutes.js';
 import indexRoutes from './routes/indexRoutes.js'
+import logsRoutes from './routes/logsRoutes.js'
+import networkRoutes from './routes/networkRoutes.js'
+import serviceRoutes from './routes/serviceRoutes.js';
 
-// Load environment variables from the .env file based on NODE_ENV
 config({ path: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) });
 
 const app = express();
@@ -23,6 +25,9 @@ app.use('/api/account', accountRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('', loginRoutes);
 app.use('/index/api/', indexRoutes)
+app.use('/logs', logsRoutes)
+app.use('/network', networkRoutes)
+app.use('/service', serviceRoutes);
 
 // Get the port from environment variables or use 3000 as default
 const PORT = process.env.PORT || 3000;
