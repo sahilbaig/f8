@@ -9,6 +9,7 @@ import indexRoutes from './routes/indexRoutes.js'
 import logsRoutes from './routes/logsRoutes.js'
 import networkRoutes from './routes/networkRoutes.js'
 import serviceRoutes from './routes/serviceRoutes.js';
+import updatesRoutes from './routes/updatesRoutes.js'
 
 config({ path: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) });
 
@@ -21,14 +22,14 @@ app.use(express.json());
 app.use(cors());
 
 // Use routes
-app.use('/api/account', accountRoutes);
+app.use('/accounts', accountRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('', loginRoutes);
 app.use('/index/api/', indexRoutes)
 app.use('/logs', logsRoutes)
 app.use('/network', networkRoutes)
 app.use('/service', serviceRoutes);
-
+app.use('/updates', updatesRoutes)
 // Get the port from environment variables or use 3000 as default
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
