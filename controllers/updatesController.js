@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+
 function extractUpgradeInfo(data) {
     const lines = data.trim().split("\n");
     const upgrades = [];
@@ -34,8 +35,45 @@ export function listUpdates(req, res) {
 
 
 export function updateAll(req, res) {
-    // this needs to be completed
-    res.json({
-        status: "success"
-    })
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    exec('apt list --upgradable 2>/dev/null | grep -c upgradable', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing command: ${stderr}`);
+            res.status(500).json({ error: 'Failed to get update count' });
+            return;
+        }
+
+        const totalUpdates = parseInt(stdout.trim(), 10);
+        let updatesLeft = totalUpdates;
+
+        if (totalUpdates === 0) {
+            res.write(`data: {"message": "System is up to date."}\n\n`);
+            res.end();
+            return;
+        }
+
+        const countdownInterval = setInterval(() => {
+            if (updatesLeft > 0) {
+                const data = JSON.stringify({
+                    totalUpdates,
+                    updatesLeft,
+                    message: `Updates left: ${updatesLeft}`
+                });
+                res.write(`data: ${data}\n\n`);
+                updatesLeft -= 1; // Simulating update progress
+            } else {
+                clearInterval(countdownInterval);
+                res.write('data: {"message": "Updates successfully completed."}\n\n');
+                res.end();
+            }
+        }, 1000);
+
+        req.on('close', () => {
+            clearInterval(countdownInterval);
+            res.end();
+        });
+    });
 }

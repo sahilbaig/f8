@@ -82,3 +82,30 @@ export function mettalicDashboard(req, res) {
         res.json(parsedData);
     });
 }
+
+export function metallicLogs(req, res) {
+    res.json({ "metaalic": "Logs" })
+}
+
+export function metallicServices(req, res) {
+    res.json({ "metaalic": "Services" })
+}
+
+// cv list 
+// #!/usr/bin/python3
+// import sys
+// import subprocess
+// line=sys.argv[1]
+// p = subprocess.run('sudo commvault list | awk -F "|" \'{{print ${} }}\''.format(line), stdout = subprocess.PIPE, text = True, shell = True)
+
+
+
+// //cv list 
+// #!/usr/bin / python3
+// import sys
+// import subprocess
+// service=sys.argv[1]
+// if service == 'force':
+//     p = subprocess.run('sudo  commvault -force start', stdout = subprocess.PIPE, text = True, shell = True)
+// else:
+// p = subprocess.run('sudo  commvault {}'.format(service), stdout = subprocess.PIPE, text = True, shell = True
