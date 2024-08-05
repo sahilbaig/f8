@@ -83,29 +83,65 @@ export function mettalicDashboard(req, res) {
     });
 }
 
+import fs from 'fs';
+import path from 'path';
+
+const parseLogData = (data) => {
+    const lines = data.split('\n');
+    return lines.map(line => {
+        const [timestamp, message] = line.split(' - ');
+        return { timestamp, message };
+    });
+};
+
+
+// Helper function to parse dashboard status data
 export function metallicLogs(req, res) {
-    res.json({ "metaalic": "Logs" })
+    const statusScriptPath = '/opt/F8Tech/backend/scripts/metallic/status.sh';
+    const logScriptPath = '/opt/F8Tech/backend/scripts/metallic/logs.sh';
+
+    // Execute the status script to get the log directory path
+    exec(`bash ${statusScriptPath}`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing status script: ${error}`);
+            return res.status(500).json({ error: 'Failed to execute status script' });
+        }
+
+        if (stderr) {
+            console.error(`Status script error: ${stderr}`);
+            return res.status(500).json({ error: 'Error in status script execution' });
+        }
+
+        // Parse the output to get the log directory path
+        const parsedData = parseDashboardData(stdout);
+        const logsPath = parsedData.General["Log Directory"];
+        const logFilePath = path.join(logsPath, 'cvlaunchd.log');
+
+        // Run the LOG.sh script to read the log file
+        exec(`sudo bash ${logScriptPath} ${logFilePath} 10`, (err, logData, logStderr) => { // Adjust the size argument as needed
+            if (err) {
+                console.error(`Error executing LOG.sh script: ${err}`);
+                return res.status(500).json({ error: 'Failed to execute LOG.sh script' });
+            }
+
+            if (logStderr) {
+                console.error(`LOG.sh script error: ${logStderr}`);
+                return res.status(500).json({ error: 'Error in LOG.sh script execution' });
+            }
+
+            // Process the log data (optional)
+            const parsedLogs = parseLogData(logData);
+
+            // Send the processed log data as the response
+            res.json(parsedLogs);
+        });
+    });
 }
 
 export function metallicServices(req, res) {
     res.json({ "metaalic": "Services" })
 }
 
-// cv list 
-// #!/usr/bin/python3
-// import sys
-// import subprocess
-// line=sys.argv[1]
-// p = subprocess.run('sudo commvault list | awk -F "|" \'{{print ${} }}\''.format(line), stdout = subprocess.PIPE, text = True, shell = True)
 
 
-
-// //cv list 
-// #!/usr/bin / python3
-// import sys
-// import subprocess
-// service=sys.argv[1]
-// if service == 'force':
-//     p = subprocess.run('sudo  commvault -force start', stdout = subprocess.PIPE, text = True, shell = True)
-// else:
-// p = subprocess.run('sudo  commvault {}'.format(service), stdout = subprocess.PIPE, text = True, shell = True
+//cvd.log cvfwd.log clmgrs.log and cvlaunchd.log 
