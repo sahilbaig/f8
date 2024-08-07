@@ -96,9 +96,15 @@ const parseLogData = (data) => {
 
 
 // Helper function to parse dashboard status data
+
+// import { parseDashboardData, parseLogData } from './your-utils-file'; // Import your parsing functions
+
 export function metallicLogs(req, res) {
     const statusScriptPath = '/opt/F8Tech/backend/scripts/metallic/status.sh';
     const logScriptPath = '/opt/F8Tech/backend/scripts/metallic/logs.sh';
+
+    // Check if logFile is provided in the request body
+    const logFile = req.body.logFile || 'cvlaunchd.log'; // Default to 'cvlaunchd.log' if not provided
 
     // Execute the status script to get the log directory path
     exec(`bash ${statusScriptPath}`, (error, stdout, stderr) => {
@@ -115,7 +121,7 @@ export function metallicLogs(req, res) {
         // Parse the output to get the log directory path
         const parsedData = parseDashboardData(stdout);
         const logsPath = parsedData.General["Log Directory"];
-        const logFilePath = path.join(logsPath, 'cvlaunchd.log');
+        const logFilePath = path.join(logsPath, logFile);
 
         // Run the LOG.sh script to read the log file
         exec(`sudo bash ${logScriptPath} ${logFilePath} 10`, (err, logData, logStderr) => { // Adjust the size argument as needed
@@ -132,11 +138,13 @@ export function metallicLogs(req, res) {
             // Process the log data (optional)
             const parsedLogs = parseLogData(logData);
 
+
             // Send the processed log data as the response
             res.json(parsedLogs);
         });
     });
 }
+
 
 export function metallicServices(req, res) {
     res.json({ "metaalic": "Services" })
