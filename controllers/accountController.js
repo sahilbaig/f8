@@ -26,13 +26,15 @@ export function getAccounts(req, res) {
 
 export function addUser(req, res) {
     const { username, password } = req.body;
-    const scriptPath = '/opt/F8Tech/backend/accounts/scripts/useradd.sh';
+    const scriptPath = '/opt/F8Tech/backend/scripts/accounts/useradd.sh';
 
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    exec(`bash ${scriptPath} ${username} ${password}`, (error, stdout, stderr) => {
+
+
+    exec(`sudo bash ${scriptPath} ${username} ${password}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing script: ${error}`);
             return res.status(500).json({ error: 'Failed to add user' });
@@ -49,7 +51,8 @@ export function addUser(req, res) {
 
 export function deleteUser(req, res) {
     const { username } = req.body;
-    const scriptPath = '/opt/F8Tech/backend/accounts/scripts/delete-user.sh';
+    console.log(req.body)
+    const scriptPath = '/opt/F8Tech/backend/scripts/accounts/delete-user.sh';
 
     if (!username) {
         return res.status(400).json({ error: 'Username is required' });
@@ -66,19 +69,21 @@ export function deleteUser(req, res) {
             return res.status(500).json({ error: 'Error in script execution' });
         }
 
-        res.json({ username, message: 'User deleted successfully' });
+        res.json({ message: 'User deleted successfully' });
     });
+
+
 }
 
 export function changePassword(req, res) {
     const { username, password } = req.body;
-    const scriptPath = '/opt/F8Tech/backend/accounts/scripts/password_change.py';
+    const scriptPath = '/opt/F8Tech/backend/scripts/accounts/change-password.sh';
 
     if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
     }
 
-    exec(`sudo python3 ${scriptPath} ${username} ${password}`, (error, stdout, stderr) => {
+    exec(`sudo bash ${scriptPath} ${username} ${password}`, (error, stdout, stderr) => {
         if (error) {
             console.error(`Error executing script: ${error}`);
             return res.status(500).json({ error: 'Failed to change password' });
@@ -98,11 +103,11 @@ export function editAdminStatus(req, res) {
     const username = dataReceived.name;
 
     // Construct the command to run the convert-to-admin script
-    const command = `/opt/F8Tech/backend/accounts/scripts/convert-to-admin.sh ${username}`;
+    const command = `/opt/F8Tech/backend/scripts/accounts/convert-to-admin.sh sudo ${username}`;
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            console.error(`Error executing script: ${stderr}`);
+            console.error(`Error executing script: ${error.message}`);
             return res.status(500).json({ error: 'Failed to update admin status' });
         }
 
