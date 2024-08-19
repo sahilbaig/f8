@@ -11,6 +11,7 @@ import networkRoutes from './routes/networkRoutes.js'
 import serviceRoutes from './routes/serviceRoutes.js';
 import updatesRoutes from './routes/updatesRoutes.js'
 import metallicRoutes from './routes/metallicRoutes.js'
+import terminalRoutes from './routes/terminalRoutes.js'
 
 config({ path: resolve(process.cwd(), `.env.${process.env.NODE_ENV}`) });
 
@@ -32,6 +33,8 @@ app.use('/network', networkRoutes)
 app.use('/service', serviceRoutes);
 app.use('/updates', updatesRoutes);
 app.use('/metallic', metallicRoutes)
+app.use('/terminal', terminalRoutes)
+
 // Get the port from environment variables or use 3000 as default
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

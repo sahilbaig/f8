@@ -71,6 +71,17 @@ configure_sudoers() {
     sudo chmod 440 "$SUDOERS_FILE"
 }
 
+install_terminal() {
+    echo "Installing terminal dependencies and ttyd..."
+    sudo apt-get update
+    sudo apt-get install -y build-essential cmake git libjson-c-dev libwebsockets-dev
+    git clone https://github.com/tsl0922/ttyd.git
+    cd ttyd && mkdir build && cd build
+    cmake ..
+    make && sudo make install
+    echo "ttyd installed successfully."
+}
+
 main() {
     create_directory "$DEST_DIR"
     copy_files
@@ -80,7 +91,8 @@ main() {
     setup_services
     make_scripts_executable
     configure_sudoers
-    echo "Setup complete. The project has been copied to $DEST_DIR, dependencies have been installed, services have been set up and started, and script permissions and sudo access have been configured."
+    install_terminal
+    echo "Setup complete. The project has been copied to $DEST_DIR, dependencies have been installed, services have been set up and started, script permissions and sudo access have been configured, and ttyd has been installed."
 }
 
 main
