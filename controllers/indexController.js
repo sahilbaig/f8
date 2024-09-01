@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import * as OS from 'os';
 import { exec } from 'child_process';
 
+import InfoStructure from '../utility/infoStructure.js';
 // Function to get CPU percentage
 export async function cpu_percent(req, res) {
     os.cpuUsage((v) => {
@@ -19,7 +20,21 @@ export async function cpu_percent(req, res) {
 // Function to get hostname
 export async function getHostname(req, res) {
     const hostname = OS.hostname();
-    res.json({ data: hostname });
+    const data = {
+        'primary': hostname,
+        'additional': {},
+    }
+    res.json(data);
+}
+export async function getRAMInfo(req, res) {
+
+    const data = {
+        'primary': "Unable to fetch data ",
+        'additional': {}
+    }
+    const totalMemoryBytes = OS.totalmem();
+    data.primary = `${(totalMemoryBytes / (1024 ** 3)).toFixed(2)} GB`;
+    res.json(data);
 }
 
 // Function to get system info
@@ -199,12 +214,15 @@ export async function getProcessorInfo(req, res) {
         });
 
         // Return the extracted information as JSON
-        res.json({
-            architecture,
-            speed: cpuSpeed,
-            processor_name: processorName,
-            num_cores: numCores
-        });
+        const data = {
+            'primary': processorName,
+            'additional': {
+                speed: cpuSpeed,
+                processor_name: processorName,
+                num_cores: numCores
+            },
+        }
+        res.json(data);
     } catch (error) {
         console.error('Error fetching processor info:', error);
         res.status(500).json({ error: error.message });

@@ -36,6 +36,7 @@ async function authenticateUser(username, password) {
 }
 
 export async function login(req, res) {
+    console.log("here")
     const { username, password } = req.body;
 
     // Validate the input
