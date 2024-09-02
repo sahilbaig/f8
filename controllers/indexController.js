@@ -12,7 +12,7 @@ export async function cpu_percent(req, res) {
 
         res.json({
             newDataPoint: num,
-            newLabel: newLabel
+            newLabel: newLabel,
         });
     });
 }
@@ -101,24 +101,30 @@ export async function ramPercent(req, res) {
         // Get memory information
         const memoryData = await si.mem();
 
+        // Convert bytes to gigabytes, round to 2 decimal places, and convert back to number
+        const bytesToGB = (bytes) => parseFloat((bytes / (1024 ** 3)).toFixed(2));
+
         // Calculate RAM usage percentage
-        const totalMemory = memoryData.total;
-        const usedMemory = memoryData.used;
-        const ramUsagePercentage = (usedMemory / totalMemory) * 100;
+        const totalMemoryGB = bytesToGB(memoryData.total);
+        const usedMemoryGB = bytesToGB(memoryData.used);
+        const ramUsagePercentage = parseFloat(((usedMemoryGB / totalMemoryGB) * 100).toFixed(2)); // Round percentage to 2 decimal places
 
         // Get the current timestamp
         const newLabel = format(new Date(), 'HH:mm:ss');
 
-        // Respond with the RAM usage data
+        // Respond with the RAM usage data in GB
         res.json({
             newDataPoint: ramUsagePercentage,
-            newLabel: newLabel
+            newLabel: newLabel,
+            total: totalMemoryGB,
+            used: usedMemoryGB,
         });
     } catch (error) {
         console.error('Error fetching RAM usage:', error);
         res.status(500).json({ error: 'Failed to fetch RAM usage' });
     }
 }
+
 
 export async function diskUsage(req, res) {
     try {
