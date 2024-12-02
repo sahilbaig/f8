@@ -15,7 +15,7 @@ async function authenticateUser(username, password) {
     try {
         // Check credentials
         const { stdout: checkCredentials } = await execPromise(
-            `sudo python3 /opt/F8Tech/backend/scripts/auth/authenticate.py ${username} ${password}`
+            `sudo python3 /opt/F8Tech/backend/scripts/auth/authenticate.sh ${username} ${password}`
         );
 
         if (checkCredentials.trim() === "True") {
